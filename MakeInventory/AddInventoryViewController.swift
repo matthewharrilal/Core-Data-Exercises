@@ -54,13 +54,13 @@ class AddInventoryViewController: UIViewController {
     
     
     @IBAction func deleteButton(_ sender: Any) {
-        var managedObjectContext: NSManagedObjectContext?
-        managedObjectContext?.delete(managedObject!)
+        let context = coreDataStack.viewContext
+        
+        
+        context.delete(managedObject!)
         do {
-           try? managedObjectContext?.save()
-            print("Changes have been saved")
+            try? context.save()
         }
-      
         self.navigationController?.popViewController(animated: true)
     }
 }
