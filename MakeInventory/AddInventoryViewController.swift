@@ -31,6 +31,8 @@ class AddInventoryViewController: UIViewController {
     @IBAction func savePressed(_ sender: Any) {
         guard let name = inventoryNameField.text, let quantity = Int64(inventoryQuantityField.text!), let date = inventoryDateField.text else {return}
         
+        
+        // We are accessing the data from the background queue and in the inventories view controller we essentially are fetching this data from the main queue or the view context
         let inv = Inventory(context: coreDataStack.privateContext)
         
         inv.name = name
@@ -43,7 +45,7 @@ class AddInventoryViewController: UIViewController {
         managedObject?.setValue(date, forKey: "date")
         
         
-        
+        // We want to save the changes we made to view context or the main queue due to the simple reason that we want to be able to the fact that the user wants to be able to see the changes they made to their inventory item
         coreDataStack.saveTo(context: coreDataStack.viewContext)
         
         self.navigationController?.popViewController(animated: true)
@@ -53,8 +55,12 @@ class AddInventoryViewController: UIViewController {
     
     @IBAction func deleteButton(_ sender: Any) {
         var managedObjectContext: NSManagedObjectContext?
-        print(coreDataStack.privateContext)
-        managedObjectContext?.delete(NSManagedObject(context: coreDataStack.privateContext))
-        print("Is this working?")
+        managedObjectContext?.delete(managedObject!)
+        do {
+           try? managedObjectContext?.save()
+            print("Changes have been saved")
+        }
+      
+        self.navigationController?.popViewController(animated: true)
     }
 }
